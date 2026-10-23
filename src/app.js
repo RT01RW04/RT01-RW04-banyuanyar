@@ -16,6 +16,15 @@
     kodepos: "57137",
     alamatLengkap: "Margorejo, RT 01 / RW 04, Banyuanyar, Banjarsari, Surakarta, Jawa Tengah 57137",
     maps: "https://www.google.com/maps/search/?api=1&query=Banyuanyar+Banjarsari+Surakarta",
+    /* ---------- Akun pengurus untuk mengisi pengumuman ----------
+       Satu akun dipakai bersama seluruh pengurus.
+       Untuk mengganti kata sandi, lihat README bagian "Mengganti akun pengurus".
+       Catatan: situs statis — ini penghalang ringan, bukan sistem keamanan penuh. */
+    admin: {
+      salt: "rt01-rw04-banyuanyar",
+      user: "pengurus",
+      hash: "e4803442c51dfe92"
+    },
     pengurus: [
       { nama: "Awan Prihanto, S.T.", peran: "Ketua RT", wa: "08126943924", lead: true,
         ket: "Koordinator umum & penerima laporan keluhan warga." },
@@ -362,6 +371,377 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.6a8.4 8.4 0 0 1-8.5 8.3 8.7 8.7 0 0 1-3.7-.8L4 21l1.7-4.6A8.4 8.4 0 1 1 21 11.6Z"/><circle cx="8.8" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r="1.05" fill="currentColor" stroke="none"/></svg>
         </a>
       </div>`).join("");
+  }
+
+
+  /* ---------- 8c. Pengumuman warga + panel pengurus ---------- */
+  const PUM_KEY = "rt01_pengumuman_v1";
+  const ADMIN_KEY = "rt01_admin_v1";
+
+  function hashPass(user, pass) {
+    const str = (CONFIG.admin.salt + "|" + String(user).trim().toLowerCase() + "|" + String(pass)).toLowerCase();
+    let h1 = 5381, h2 = 52711;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      h1 = ((h1 << 5) + h1 + c) >>> 0;
+      h2 = ((h2 << 5) + h2 + c * 7) >>> 0;
+    }
+    return ("00000000" + h1.toString(16)).slice(-8) + ("00000000" + h2.toString(16)).slice(-8);
+  }
+
+  function pumLoad() {
+    try {
+      const raw = localStorage.getItem(PUM_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function pumSave(list) {
+    try { localStorage.setItem(PUM_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function pumToday() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function pumTanggalID(iso) {
+    if (!iso) return "";
+    const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
+      "Agustus", "September", "Oktober", "November", "Desember"];
+    const d = new Date(iso + "T00:00:00");
+    if (isNaN(d)) return iso;
+    return d.getDate() + " " + bulan[d.getMonth()] + " " + d.getFullYear();
+  }
+  function pumBaru(iso) {
+    const d = new Date(iso + "T00:00:00");
+    if (isNaN(d)) return false;
+    return (Date.now() - d.getTime()) <= 7 * 864e5;
+  }
+  function pumSort(list) {
+    return list.slice().sort((a, b) => {
+      if (!!b.pin !== !!a.pin) return b.pin ? 1 : -1;
+      return String(b.tanggal || "").localeCompare(String(a.tanggal || ""));
+    });
+  }
+
+  function renderPengumuman() {
+    const list = $("#pengumumanList");
+    if (!list) return;
+    const data = pumSort(pumLoad());
+    const count = $("#pumCount");
+    if (count) count.textContent = data.length ? data.length + " pengumuman" : "Belum ada pengumuman";
+
+    if (!data.length) {
+      list.innerHTML =
+        '<div class="pum-empty" data-reveal>' +
+          '<span class="pum-empty__ic" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h11l4-2v10l-4-2H4z"/><path d="M7 15v4a1.5 1.5 0 0 0 3 0v-2"/></svg>' +
+          "</span>" +
+          "<h3>Belum ada pengumuman</h3>" +
+          "<p>Pengurus dapat menambahkan kabar terbaru melalui tombol <strong>Kelola</strong> di atas. Pengumuman akan tampil di sini lengkap dengan tanggal dan kategori.</p>" +
+          '<button class="btn btn--ghost btn--sm" type="button" data-open-admin>Masuk sebagai pengurus</button>' +
+        "</div>";
+      const foot = $("#pengumumanFoot");
+      if (foot) foot.hidden = true;
+      return;
+    }
+
+    list.innerHTML = data.map((a) => {
+      const baru = pumBaru(a.tanggal);
+      return '<article class="pum-card' + (a.pin ? " is-pinned" : "") + '">' +
+        '<div class="pum-card__meta">' +
+          '<span class="pum-tag pum-tag--' + escapeHTML((a.kategori || "Umum").toLowerCase()) + '">' + escapeHTML(a.kategori || "Umum") + "</span>" +
+          (a.pin ? '<span class="pum-pin">Disematkan</span>' : "") +
+          (baru ? '<span class="pum-new">Baru</span>' : "") +
+          '<time class="pum-date" datetime="' + escapeHTML(a.tanggal || "") + '">' + escapeHTML(pumTanggalID(a.tanggal)) + "</time>" +
+        "</div>" +
+        '<h3 class="pum-card__title">' + escapeHTML(a.judul || "") + "</h3>" +
+        '<p class="pum-card__body">' + escapeHTML(a.isi || "").replace(/\n/g, "<br>") + "</p>" +
+        '<div class="pum-card__foot">' +
+          '<span class="pum-card__by">Pengurus RT</span>' +
+          '<button class="pum-share" type="button" data-share="' + escapeHTML(a.id) + '">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.6a8.4 8.4 0 0 1-8.5 8.3 8.7 8.7 0 0 1-3.7-.8L4 21l1.7-4.6A8.4 8.4 0 1 1 21 11.6Z"/></svg>' +
+            "Bagikan" +
+          "</button>" +
+        "</div>" +
+      "</article>";
+    }).join("");
+
+    const foot = $("#pengumumanFoot");
+    if (foot) {
+      foot.hidden = false;
+      foot.innerHTML = "Pengumuman disimpan di perangkat ini. Ketuk <strong>Bagikan</strong> untuk meneruskan ke grup WhatsApp warga.";
+    }
+  }
+
+  function pumShare(id) {
+    const item = pumLoad().find((a) => String(a.id) === String(id));
+    if (!item) return;
+    const teks = "*PENGUMUMAN WARGA RT 01 / RW 04*" +
+      "\n" + pumTanggalID(item.tanggal) +
+      "\n\n*" + item.judul + "*" +
+      "\n" + item.isi +
+      "\n\n— Pengurus RT 01 / RW 04, Margorejo, Banyuanyar\n" + location.href.split("#")[0];
+    window.open("https://wa.me/?text=" + encodeURIComponent(teks), "_blank", "noopener");
+  }
+
+  /* --- panel admin --- */
+  function adminOpen() {
+    const m = $("#adminModal");
+    if (!m) return;
+    m.hidden = false;
+    document.body.classList.add("admin-open");
+    const logged = sessionStorage.getItem(ADMIN_KEY) === "1";
+    $("#adminLogin").hidden = logged;
+    $("#adminBody").hidden = !logged;
+    if (logged) renderAdminList();
+    else {
+      const u = $("#adminUser");
+      if (u) setTimeout(() => u.focus(), 60);
+    }
+  }
+  function adminClose() {
+    const m = $("#adminModal");
+    if (m) m.hidden = true;
+    document.body.classList.remove("admin-open");
+  }
+  function adminLogged() { return sessionStorage.getItem(ADMIN_KEY) === "1"; }
+
+  function renderAdminList() {
+    const box = $("#pumAdminList");
+    if (!box) return;
+    const data = pumSort(pumLoad());
+    if (!data.length) {
+      box.innerHTML = '<p class="admin__empty">Belum ada pengumuman. Isi formulir di atas untuk menerbitkan yang pertama.</p>';
+      return;
+    }
+    box.innerHTML = data.map((a) =>
+      '<div class="admin-item">' +
+        '<div class="admin-item__main">' +
+          '<p class="admin-item__title">' + escapeHTML(a.judul) + "</p>" +
+          '<p class="admin-item__meta">' + escapeHTML(a.kategori || "Umum") + " · " + escapeHTML(pumTanggalID(a.tanggal)) + (a.pin ? " · disematkan" : "") + "</p>" +
+        "</div>" +
+        '<div class="admin-item__acts">' +
+          '<button type="button" class="admin-mini" data-edit="' + escapeHTML(a.id) + '">Edit</button>' +
+          '<button type="button" class="admin-mini" data-pin="' + escapeHTML(a.id) + '">' + (a.pin ? "Lepas" : "Sematkan") + "</button>" +
+          '<button type="button" class="admin-mini admin-mini--danger" data-del="' + escapeHTML(a.id) + '">Hapus</button>' +
+        "</div>" +
+      "</div>").join("");
+  }
+
+  function pumResetForm() {
+    $("#pumId").value = "";
+    $("#pumJudul").value = "";
+    $("#pumIsi").value = "";
+    $("#pumKategori").value = "Kegiatan";
+    $("#pumTanggal").value = pumToday();
+    $("#pumPin").checked = false;
+    $("#pumFormTitle").textContent = "Tambah pengumuman";
+    $("#pumSubmit").textContent = "Terbitkan";
+    $("#pumCancel").hidden = true;
+  }
+
+  function initPengumuman() {
+    const list = $("#pengumumanList");
+    if (!list) return;
+    renderPengumuman();
+
+    document.addEventListener("click", (e) => {
+      const open = e.target.closest("#adminOpen, [data-open-admin]");
+      if (open) { e.preventDefault(); adminOpen(); return; }
+      const share = e.target.closest("[data-share]");
+      if (share) { pumShare(share.getAttribute("data-share")); return; }
+
+      const edit = e.target.closest("[data-edit]");
+      if (edit) {
+        const a = pumLoad().find((x) => String(x.id) === edit.getAttribute("data-edit"));
+        if (!a) return;
+        $("#pumId").value = a.id;
+        $("#pumJudul").value = a.judul;
+        $("#pumIsi").value = a.isi;
+        $("#pumKategori").value = a.kategori || "Umum";
+        $("#pumTanggal").value = a.tanggal || pumToday();
+        $("#pumPin").checked = !!a.pin;
+        $("#pumFormTitle").textContent = "Edit pengumuman";
+        $("#pumSubmit").textContent = "Simpan perubahan";
+        $("#pumCancel").hidden = false;
+        $("#pumJudul").focus();
+        return;
+      }
+      const del = e.target.closest("[data-del]");
+      if (del) {
+        if (!confirm("Hapus pengumuman ini?")) return;
+        pumSave(pumLoad().filter((x) => String(x.id) !== del.getAttribute("data-del")));
+        renderAdminList(); renderPengumuman(); toast("Pengumuman dihapus.");
+        return;
+      }
+      const pin = e.target.closest("[data-pin]");
+      if (pin) {
+        const id = pin.getAttribute("data-pin");
+        pumSave(pumLoad().map((x) => String(x.id) === id ? Object.assign({}, x, { pin: !x.pin }) : x));
+        renderAdminList(); renderPengumuman(); toast("Urutan pengumuman diperbarui.");
+      }
+    });
+
+    const closeBtn = $("#adminClose");
+    if (closeBtn) closeBtn.addEventListener("click", adminClose);
+    const modal = $("#adminModal");
+    if (modal) {
+      modal.addEventListener("click", (e) => { if (e.target === modal) adminClose(); });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal && !modal.hidden) adminClose();
+    });
+
+    const login = $("#adminLogin");
+    if (login) {
+      login.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const u = $("#adminUser").value;
+        const p = $("#adminPass").value;
+        const ok = hashPass(u, p) === CONFIG.admin.hash;
+        $("#adminErr").hidden = ok;
+        if (!ok) {
+          $("#adminPass").value = "";
+          $("#adminPass").focus();
+          return;
+        }
+        sessionStorage.setItem(ADMIN_KEY, "1");
+        $("#adminPass").value = "";
+        $("#adminLogin").hidden = true;
+        $("#adminBody").hidden = false;
+        pumResetForm();
+        renderAdminList();
+        toast("Selamat datang, pengurus.");
+      });
+    }
+
+    const logout = $("#adminLogout");
+    if (logout) logout.addEventListener("click", () => {
+      sessionStorage.removeItem(ADMIN_KEY);
+      adminClose();
+      toast("Anda sudah keluar dari panel pengurus.");
+    });
+
+    const form = $("#pumForm");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!adminLogged()) { toast("Sesi berakhir. Silakan masuk lagi.", "err"); return; }
+        const judul = $("#pumJudul").value.trim();
+        const isi = $("#pumIsi").value.trim();
+        if (judul.length < 3 || isi.length < 10) {
+          toast("Judul dan isi pengumuman belum lengkap.", "err");
+          return;
+        }
+        const id = $("#pumId").value;
+        const item = {
+          id: id || "p" + Date.now().toString(36),
+          judul: judul,
+          isi: isi,
+          kategori: $("#pumKategori").value,
+          tanggal: $("#pumTanggal").value || pumToday(),
+          pin: $("#pumPin").checked
+        };
+        const data = pumLoad();
+        const idx = data.findIndex((x) => String(x.id) === String(id));
+        if (idx >= 0) data[idx] = item; else data.push(item);
+        pumSave(data);
+        pumResetForm();
+        renderAdminList();
+        renderPengumuman();
+        toast(idx >= 0 ? "Pengumuman diperbarui." : "Pengumuman diterbitkan.");
+        const first = $("#pengumumanList .pum-card");
+        if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      const cancel = $("#pumCancel");
+      if (cancel) cancel.addEventListener("click", pumResetForm);
+      $("#pumTanggal").value = pumToday();
+    }
+  }
+
+  /* ---------- 8d. Penilaian bintang 5 ---------- */
+  const RATE_KEY = "rt01_penilaian_v1";
+  const RATE_LABEL = ["", "Sangat kurang", "Kurang", "Cukup", "Baik", "Sangat baik"];
+  const RATE_TARGET = {
+    rt: { nama: "Ketua RT — Bp. Awan Prihanto, S.T.", wa: "08126943924" },
+    pkk: { nama: "Ketua PKK — Ibu Handayani, S.E.", wa: "082137744787" }
+  };
+
+  function rateLoad() {
+    try { return JSON.parse(localStorage.getItem(RATE_KEY) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function rateSave(v) {
+    try { localStorage.setItem(RATE_KEY, JSON.stringify(v)); } catch (e) {}
+  }
+
+  function initPenilaian() {
+    const cards = $$(".rate-card");
+    if (!cards.length) return;
+    const saved = rateLoad();
+
+    cards.forEach((card) => {
+      const key = card.getAttribute("data-rate");
+      const stars = $$(".rate-star", card);
+      const label = $("[data-label]", card);
+      const send = $("[data-send]", card);
+      const done = $("[data-done]", card);
+      const note = $(".rate-card__note", card);
+      let value = saved[key] ? saved[key].bintang : 0;
+
+      function paint() {
+        stars.forEach((s, i) => {
+          s.classList.toggle("is-on", i < value);
+          s.setAttribute("aria-pressed", i < value ? "true" : "false");
+        });
+        if (label) label.textContent = value ? "★ " + value + " dari 5 — " + RATE_LABEL[value] : "Ketuk bintang untuk menilai";
+        if (send) send.hidden = !value;
+      }
+
+      stars.forEach((s) => {
+        s.addEventListener("click", () => {
+          value = Number(s.getAttribute("data-v"));
+          paint();
+          if (done) done.hidden = true;
+        });
+        s.addEventListener("mouseenter", () => {
+          stars.forEach((x, i) => x.classList.toggle("is-hover", i < Number(s.getAttribute("data-v"))));
+        });
+        s.addEventListener("mouseleave", () => {
+          stars.forEach((x) => x.classList.remove("is-hover"));
+        });
+      });
+
+      if (send) {
+        send.addEventListener("click", () => {
+          if (!value) return;
+          const t = RATE_TARGET[key];
+          const bintang = "★".repeat(value) + "☆".repeat(5 - value);
+          const catatan = note ? note.value.trim() : "";
+          const teks = "*PENILAIAN WARGA RT 01 / RW 04*\n" +
+            t.nama + "\n" +
+            "Nilai: " + bintang + " (" + value + "/5 — " + RATE_LABEL[value] + ")" +
+            (catatan ? "\nCatatan: " + catatan : "") +
+            "\n\nDikirim dari situs warga RT 01 / RW 04.";
+          window.open("https://wa.me/" + waNumber(t.wa) + "?text=" + encodeURIComponent(teks), "_blank", "noopener");
+          const all = rateLoad();
+          all[key] = { bintang: value, catatan: catatan, tanggal: new Date().toISOString() };
+          rateSave(all);
+          if (done) {
+            done.hidden = false;
+            done.textContent = "Tersimpan di perangkat ini: " + bintang + " (" + RATE_LABEL[value] + "). Terima kasih!";
+          }
+          toast("Penilaian dikirim lewat WhatsApp. Terima kasih!");
+        });
+      }
+
+      if (saved[key] && note) note.value = saved[key].catatan || "";
+      if (saved[key] && done) {
+        done.hidden = false;
+        done.textContent = "Penilaian Anda: " + "★".repeat(saved[key].bintang) + " (" + RATE_LABEL[saved[key].bintang] + ")";
+      }
+      paint();
+    });
   }
 
   /* ---------- 9. Salin nomor ---------- */
@@ -1034,6 +1414,8 @@
     fillConfig();
     renderHistory();
     renderBinsShowcase();
+    initPengumuman();
+    initPenilaian();
     initQuiz();
     initCommit();
     initGallery();

@@ -144,6 +144,26 @@ Nilai `jawab` hanya boleh: `organik`, `anorganik`, atau `residu`.
 
 ---
 
+## 7b. Akun pengurus & pengumuman
+
+Pengumuman diisi lewat tombol **Kelola** pada bagian Pengumuman, memakai satu akun bersama:
+
+- Nama pengguna: `pengurus`
+- Kata sandi: lihat `CONFIG.admin` di `src/app.js` (hubungi Ketua RT bila lupa)
+
+**Mengganti kata sandi:**
+
+```bash
+python3 src/hash_password.py "kata-sandi-baru"
+```
+
+Salin hasil `hash` ke `src/app.js` → `CONFIG.admin.hash`, lalu `python3 src/build.py`.
+
+**Mengisi pengumuman:** Pengumuman → **Kelola** → masuk → isi Judul, Kategori, Tanggal, Isi → **Terbitkan**.
+Gunakan **Edit / Sematkan / Hapus** pada daftar, dan **Bagikan** untuk meneruskan ke grup WhatsApp.
+
+> Situs statis: pengumuman tersimpan di peramban perangkat yang mengisinya. Untuk warga lain, gunakan tombol **Bagikan**.
+
 ## 8. Menguji sebelum di-upload
 
 Buka `index.html` di peramban (klik dua kali). Periksa:

@@ -36,6 +36,7 @@
 
     <nav class="nav" aria-label="Navigasi utama">
       <a href="#beranda" class="is-active">Beranda</a>
+      <a href="#pengumuman">Pengumuman</a>
       <a href="#pengurus">Pengurus</a>
       <a href="#layanan">Lapor</a>
       <a href="#sampah">Sampah</a>
@@ -63,6 +64,7 @@
 <nav class="mobile-nav" id="mobileNav" aria-label="Navigasi seluler">
   <a href="#beranda">Beranda</a>
   <a href="#tentang">Sekilas RT</a>
+  <a href="#pengumuman">Pengumuman Warga</a>
   <a href="#pengurus">Pengurus</a>
   <a href="#layanan">Lapor &amp; Iuran</a>
   <a href="#sampah">Himbauan Sampah</a>
@@ -218,6 +220,29 @@
   </div>
 </section>
 
+<!-- ============ PENGUMUMAN ============ -->
+<section class="section pengumuman" id="pengumuman" aria-labelledby="pengumumanTitle">
+  <div class="wrap">
+    <div class="pum-head" data-reveal>
+      <div class="pum-head__text">
+        <span class="kicker">Informasi warga</span>
+        <h2 id="pengumumanTitle">Pengumuman <mark class="hl">warga</mark></h2>
+        <p>Kabar terbaru dari pengurus RT 01 / RW 04 — kegiatan, kesehatan, keamanan, dan iuran.</p>
+      </div>
+      <div class="pum-head__side">
+        <span class="pum-count" id="pumCount">0 pengumuman</span>
+        <button class="btn btn--ghost btn--sm" id="adminOpen" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2.4"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Kelola
+        </button>
+      </div>
+    </div>
+
+    <div class="pum-list" id="pengumumanList" aria-live="polite"></div>
+    <p class="pum-foot" id="pengumumanFoot" hidden></p>
+  </div>
+</section>
+
 <!-- ============ PENGURUS ============ -->
 <section class="section section--paper" id="pengurus">
   <div class="wrap">
@@ -232,6 +257,50 @@
         <strong style="color:var(--ink)">Semua pengurus dapat dihubungi langsung.</strong> Ketua RT, Ketua PKK, Sekretaris I–II, dan Bendahara I–II terhubung lewat tombol WhatsApp. Nomor pribadi tidak ditampilkan di halaman demi privasi.
       </p>
       <a class="btn btn--ghost btn--sm" href="#layanan" data-open-service="usulan">Kirim usulan / surat</a>
+    </div>
+
+    <div class="rate" id="penilaian" data-reveal>
+      <div class="rate__head">
+        <h3>Penilaian kinerja pengurus</h3>
+        <p>Beri nilai 1–5 bintang untuk Ketua RT dan Ketua PKK. Penilaian dikirim ke pengurus lewat WhatsApp — tidak ada data yang tersimpan di server.</p>
+      </div>
+      <div class="rate__grid">
+        <article class="rate-card" data-rate="rt">
+          <div class="rate-card__top">
+            <span class="rate-card__role">Ketua RT</span>
+            <h4 class="rate-card__name">Awan Prihanto, S.T.</h4>
+          </div>
+          <div class="rate-stars" role="group" aria-label="Nilai untuk Ketua RT">
+            <button type="button" class="rate-star" data-v="1" aria-label="1 bintang">★</button>
+            <button type="button" class="rate-star" data-v="2" aria-label="2 bintang">★</button>
+            <button type="button" class="rate-star" data-v="3" aria-label="3 bintang">★</button>
+            <button type="button" class="rate-star" data-v="4" aria-label="4 bintang">★</button>
+            <button type="button" class="rate-star" data-v="5" aria-label="5 bintang">★</button>
+          </div>
+          <p class="rate-card__label" data-label>Ketuk bintang untuk menilai</p>
+          <input class="rate-card__note" type="text" maxlength="120" placeholder="Catatan singkat (opsional)" aria-label="Catatan untuk Ketua RT">
+          <button class="btn btn--wa btn--sm rate-card__send" type="button" data-send hidden>Kirim penilaian</button>
+          <p class="rate-card__done" data-done hidden></p>
+        </article>
+
+        <article class="rate-card" data-rate="pkk">
+          <div class="rate-card__top">
+            <span class="rate-card__role">Ketua PKK</span>
+            <h4 class="rate-card__name">Handayani, S.E.</h4>
+          </div>
+          <div class="rate-stars" role="group" aria-label="Nilai untuk Ketua PKK">
+            <button type="button" class="rate-star" data-v="1" aria-label="1 bintang">★</button>
+            <button type="button" class="rate-star" data-v="2" aria-label="2 bintang">★</button>
+            <button type="button" class="rate-star" data-v="3" aria-label="3 bintang">★</button>
+            <button type="button" class="rate-star" data-v="4" aria-label="4 bintang">★</button>
+            <button type="button" class="rate-star" data-v="5" aria-label="5 bintang">★</button>
+          </div>
+          <p class="rate-card__label" data-label>Ketuk bintang untuk menilai</p>
+          <input class="rate-card__note" type="text" maxlength="120" placeholder="Catatan singkat (opsional)" aria-label="Catatan untuk Ketua PKK">
+          <button class="btn btn--wa btn--sm rate-card__send" type="button" data-send hidden>Kirim penilaian</button>
+          <p class="rate-card__done" data-done hidden></p>
+        </article>
+      </div>
     </div>
   </div>
 </section>
@@ -792,6 +861,14 @@
         <div class="faq__body">Warga dihimbau memilah sampah sesuai ketentuan Pemerintah Kota Surakarta: sampah basah/organik diolah menjadi pupuk organik (komposter, takakura, atau EM4), sedangkan sampah non-organik (plastik, kertas, logam, kaca) dipilah ke kantong plastik terpisah sesuai jenisnya. Sampah residu seperti baterai dan lampu bekas dibuang ke tempat khusus B3.</div>
       </details>
       <details>
+        <summary>Siapa yang boleh menulis pengumuman warga?</summary>
+        <div class="faq__body">Pengumuman diisi oleh <strong>pengurus RT</strong> melalui tombol <em>Kelola</em> pada bagian Pengumuman, menggunakan satu akun bersama. Warga dapat membaca pengumuman terbaru dan menekan <em>Bagikan</em> untuk meneruskannya ke grup WhatsApp. Untuk menambahkan pengumuman baru, hubungi pengurus RT.</div>
+      </details>
+      <details>
+        <summary>Bagaimana penilaian bintang untuk Ketua RT dan Ketua PKK?</summary>
+        <div class="faq__body">Buka bagian <strong>Pengurus</strong>, lalu beri nilai 1–5 bintang pada kartu Ketua RT atau Ketua PKK dan tambahkan catatan bila perlu. Tekan <em>Kirim penilaian</em> — nilai dan catatan langsung diteruskan ke WhatsApp pengurus yang bersangkutan. Penilaian bersifat sukarela dan tidak ditampilkan ke warga lain.</div>
+      </details>
+      <details>
         <summary>Apakah data laporan saya disimpan di server?</summary>
         <div class="faq__body">Tidak. Situs ini berjalan sepenuhnya di perangkat Anda. Riwayat laporan hanya disimpan di penyimpanan lokal browser (localStorage) dan dapat dihapus kapan saja melalui tombol <em>Hapus semua</em> pada panel riwayat. Laporan baru terkirim setelah Anda menekan tombol WhatsApp.</div>
       </details>
@@ -890,6 +967,7 @@
       <div class="foot-col">
         <h4>Navigasi</h4>
         <a href="#beranda">Beranda</a>
+        <a href="#pengumuman">Pengumuman</a>
         <a href="#pengurus">Pengurus</a>
         <a href="#layanan">Lapor &amp; Iuran</a>
               <a href="#sampah">Himbauan Sampah</a>
@@ -940,6 +1018,85 @@
 <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
 
 <!-- ============ LIGHTBOX ============ -->
+<!-- ============ PANEL PENGURUS (PENGUMUMAN) ============ -->
+<div class="admin" id="adminModal" hidden>
+  <div class="admin__panel" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <header class="admin__head">
+      <div>
+        <p class="admin__eyebrow">Khusus pengurus</p>
+        <h3 id="adminTitle">Kelola pengumuman</h3>
+      </div>
+      <button class="admin__x" id="adminClose" type="button" aria-label="Tutup panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+
+    <form class="admin__login" id="adminLogin" autocomplete="off">
+      <p class="admin__hint">Masuk dengan akun pengurus RT. Satu akun dipakai bersama oleh seluruh pengurus.</p>
+      <label class="admin__field">
+        <span>Nama pengguna</span>
+        <input id="adminUser" type="text" inputmode="text" autocomplete="username" placeholder="pengurus" required>
+      </label>
+      <label class="admin__field">
+        <span>Kata sandi</span>
+        <input id="adminPass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </label>
+      <p class="admin__err" id="adminErr" hidden>Nama pengguna atau kata sandi belum tepat.</p>
+      <button class="btn btn--wa admin__submit" type="submit">Masuk</button>
+      <p class="admin__note">Lupa kata sandi? Hubungi Ketua RT. Pengaturan akun ada di <code>src/app.js</code>.</p>
+    </form>
+
+    <div class="admin__body" id="adminBody" hidden>
+      <form class="pum-form" id="pumForm">
+        <h4 id="pumFormTitle">Tambah pengumuman</h4>
+        <input type="hidden" id="pumId">
+        <label class="admin__field">
+          <span>Judul</span>
+          <input id="pumJudul" type="text" maxlength="90" placeholder="Contoh: Kerja bakti Minggu pagi" required>
+        </label>
+        <div class="pum-form__row">
+          <label class="admin__field">
+            <span>Kategori</span>
+            <select id="pumKategori">
+              <option value="Kegiatan">Kegiatan</option>
+              <option value="Kesehatan">Kesehatan</option>
+              <option value="Keamanan">Keamanan</option>
+              <option value="Iuran">Iuran</option>
+              <option value="Umum">Umum</option>
+            </select>
+          </label>
+          <label class="admin__field">
+            <span>Tanggal</span>
+            <input id="pumTanggal" type="date">
+          </label>
+        </div>
+        <label class="admin__field">
+          <span>Isi pengumuman</span>
+          <textarea id="pumIsi" rows="4" maxlength="700" placeholder="Tuliskan informasi lengkap: waktu, tempat, dan hal yang perlu disiapkan warga." required></textarea>
+        </label>
+        <label class="pum-check">
+          <input id="pumPin" type="checkbox">
+          <span>Sematkan di paling atas</span>
+        </label>
+        <div class="pum-form__actions">
+          <button class="btn btn--wa btn--sm" type="submit" id="pumSubmit">Terbitkan</button>
+          <button class="btn btn--ghost btn--sm" type="button" id="pumCancel" hidden>Batal edit</button>
+        </div>
+      </form>
+
+      <div class="admin__list">
+        <h4>Pengumuman tersimpan</h4>
+        <div id="pumAdminList"></div>
+      </div>
+
+      <div class="admin__foot">
+        <p>Sesuai sifat situs statis, pengumuman tersimpan di peramban perangkat ini. Untuk warga lain, gunakan tombol <strong>Bagikan ke WhatsApp</strong>.</p>
+        <button class="btn btn--ghost btn--sm" type="button" id="adminLogout">Keluar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Galeri foto" aria-hidden="true">
   <button class="lightbox__close" type="button" aria-label="Tutup galeri">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>

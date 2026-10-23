@@ -27,6 +27,8 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
 
 1. **Beranda** — sambutan, alamat lengkap, ringkasan angka, tombol cepat.
 2. **Struktur pengurus** — 7 pengurus dengan **tombol gelembung WhatsApp**. Nomor pribadi **tidak ditampilkan** di halaman; tombol langsung membuka chat dengan pesan siap kirim.
+2b. **Pengumuman warga** — papan kabar resmi pengurus: kategori (Kegiatan, Kesehatan, Keamanan, Iuran, Umum), tanggal, tanda **Disematkan** & **Baru**, dan tombol **Bagikan** ke WhatsApp. Diisi lewat panel **Kelola** (khusus pengurus, dengan nama pengguna + kata sandi).
+2c. **Penilaian bintang 5** — warga memberi nilai 1–5 bintang beserta catatan singkat untuk **Ketua RT** dan **Ketua PKK** di halaman Pengurus; penilaian terkirim ke WhatsApp masing-masing pengurus.
 3. **Keluhan Warga** → WhatsApp Ketua RT (Bp. Awan Prihanto, S.T.)
 4. **Usulan & Surat** → WhatsApp Sekretaris I (Bp. Sardi, S.Pd.)
 5. **Laporan Iuran Wajib** → WhatsApp Bendahara II (Bp. Wahyu Widodo)
@@ -53,6 +55,15 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
   2. Alternatif: GitHub Pages, Cloudflare Pages, atau Vercel — unggah satu berkas yang sama.
   3. Buat **QR code** dari tautan tersebut, lalu tempel di Pos Kamling / grup WhatsApp warga.
 
+### Unggah ke GitHub Pages (opsional)
+
+1. Buat repo baru di <https://github.com/new> — pilih **Public**, tanpa README.
+2. Klik **uploading an existing file**, seret **isi folder repo ini** (minimal `index.html`).
+3. **Settings → Pages** → Source `Deploy from a branch` → Branch `main`, folder `/ (root)` → **Save**.
+4. Tunggu 1–2 menit → situs live di `https://<akun>.github.io/<nama-repo>/`.
+
+Panduan rinci: `panduan/UPLOAD-GITHUB.md`.
+
 ---
 
 ## 4. Mengubah data pengurus / nomor WhatsApp
@@ -72,7 +83,50 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
 
 ---
 
-## 5. Usulan pengembangan lanjutan (opsional)
+## 5. Akun pengurus & pengumuman
+
+Panel **Kelola** pada bagian Pengumuman memakai satu akun bersama untuk seluruh pengurus:
+
+| Kolom | Nilai bawaan |
+|---|---|
+| Nama pengguna | `pengurus` |
+| Kata sandi | `banyuanyar2026` |
+
+> **Segera ganti kata sandi bawaan sebelum situs dibagikan ke warga.**
+
+### Mengganti kata sandi
+1. Buka terminal di folder proyek, jalankan:
+   ```bash
+   python3 src/hash_password.py "kata-sandi-baru"
+   ```
+2. Salin nilai `hash` yang muncul ke `src/app.js` pada bagian `CONFIG.admin`:
+   ```js
+   admin: {
+     salt: "rt01-rw04-banyuanyar",
+     user: "pengurus",          // boleh diganti
+     hash: "…………"               // hasil dari skrip di atas
+   }
+   ```
+3. Jalankan `python3 src/build.py`, lalu unggah `index.html` yang baru.
+
+### Cara pengurus mengisi pengumuman
+1. Buka situs → bagian **Pengumuman** → tombol **Kelola**.
+2. Masuk dengan nama pengguna dan kata sandi.
+3. Isi **Judul**, **Kategori**, **Tanggal**, **Isi**, dan centang **Sematkan** bila perlu.
+4. Tekan **Terbitkan**. Pengumuman langsung tampil; gunakan **Edit / Lepas / Hapus** pada daftar di bawah formulir.
+5. Tekan **Bagikan** pada kartu pengumuman untuk meneruskannya ke grup WhatsApp warga.
+
+### Batasan penting (situs statis)
+- Pengumuman **tersimpan di peramban perangkat tempat ia dibuat** (localStorage) — belum ada server, jadi pengumuman **tidak otomatis muncul** di perangkat warga lain.
+- Untuk menyebarkannya ke warga, gunakan tombol **Bagikan ke WhatsApp** (atau tempel teks pengumuman ke grup).
+- Login bersifat penghalang ringan (hash di dalam berkas), bukan sistem keamanan penuh. Jangan menaruh data sensitif.
+- Sesi login bertahan sampai tab ditutup (sessionStorage).
+
+### Penilaian bintang
+- Nilai disimpan di perangkat warga (agar tampil kembali saat dibuka), lalu **dikirim ke WhatsApp** Ketua RT atau Ketua PKK beserta catatan.
+- Belum ada rekap rata-rata di halaman karena tidak ada server — rekap diterima pengurus lewat WhatsApp.
+
+## 6. Usulan pengembangan lanjutan (opsional)
 
 - Nomor WhatsApp untuk Ketua PKK, Sekretaris I–II, dan Bendahara I dapat ditambahkan kapan saja (sekarang belum tercantum, jadi tombolnya belum muncul).
 - Nominal iuran wajib & jadwal jimpitan dapat ditulis permanen setelah disepakati musyawarah warga.
@@ -80,7 +134,7 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
 
 ---
 
-## 6. Kontak pengurus (nomor disembunyikan)
+## 7. Kontak pengurus (nomor disembunyikan)
 
 | Jabatan | Nama | Kontak di situs |
 |---|---|---|
@@ -96,7 +150,7 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
 
 > Catatan teknis: karena situs statis, tautan WhatsApp tetap memuat nomor di dalam alamat `wa.me` — angka hanya **tidak terlihat** oleh warga di halaman. Untuk benar-benar menutup nomor, gunakan tautan pengalihan (link shortener/redirect) di server sendiri.
 
-## 7. Data ringkas
+## 8. Data ringkas
 
 - **Alamat:** Margorejo, RT 01 / RW 04, Banyuanyar, Banjarsari, Surakarta, Jawa Tengah **57137**
 - **Ketua RT:** Awan Prihanto, S.T.
