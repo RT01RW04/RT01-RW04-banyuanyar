@@ -314,12 +314,13 @@
       const initials = p.nama.replace(/\(.*?\)/g, "").trim().split(/\s+/).slice(0, 2)
         .map((w) => w[0]).join("").toUpperCase();
       const wa = p.wa
-        ? `<a class="pcard__wa" href="https://wa.me/${waNumber(p.wa)}" target="_blank" rel="noopener"
-              data-track-wa="${escapeHTML(p.peran)}">
+        ? `<a class="pcard__wa pcard__wa--bubble" href="https://wa.me/${waNumber(p.wa)}" target="_blank" rel="noopener"
+              data-track-wa="${escapeHTML(p.peran)}" aria-label="Chat WhatsApp ${escapeHTML(p.nama)}" title="Chat WhatsApp">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.6a8.4 8.4 0 0 1-8.5 8.3 8.7 8.7 0 0 1-3.7-.8L4 21l1.7-4.6A8.4 8.4 0 1 1 21 11.6Z"/><circle cx="8.8" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r="1.05" fill="currentColor" stroke="none"/></svg>
-             ${escapeHTML(formatLocal(p.wa))}
+             <span>Chat WhatsApp</span>
            </a>`
-        : `<span class="pcard__none">Nomor WA belum dicantumkan</span>`;
+        : `<span class="pcard__none">WhatsApp belum tersedia</span>`;
+
       return `<article class="pcard ${p.lead ? "pcard--lead" : ""}" data-reveal style="transition-delay:${Math.min(i * 55, 330)}ms">
           ${p.lead ? '<span class="pcard__tag">Penerima laporan</span>' : ""}
           <div class="pcard__top">
@@ -355,11 +356,11 @@
         <div class="hotline__body">
           <p class="hotline__role">${escapeHTML(r.role)}</p>
           <p class="hotline__name">${escapeHTML(r.name)}</p>
-          <p class="hotline__num">${escapeHTML(formatLocal(r.num))}</p>
         </div>
-        <button class="copy-btn" type="button" data-copy="${escapeHTML(r.num)}" aria-label="Salin nomor ${escapeHTML(r.name)}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
-        </button>
+        <a class="hotline__wa" href="https://wa.me/${waNumber(r.num)}" target="_blank" rel="noopener"
+           aria-label="Chat WhatsApp ${escapeHTML(r.name)}" title="Chat WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.6a8.4 8.4 0 0 1-8.5 8.3 8.7 8.7 0 0 1-3.7-.8L4 21l1.7-4.6A8.4 8.4 0 1 1 21 11.6Z"/><circle cx="8.8" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r="1.05" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r="1.05" fill="currentColor" stroke="none"/></svg>
+        </a>
       </div>`).join("");
   }
 

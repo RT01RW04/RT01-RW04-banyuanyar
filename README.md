@@ -1,152 +1,109 @@
-# 🏡 Website RT 01 / RW 04 — Margorejo, Banyuanyar, Banjarsari, Surakarta
+# Website RT 01 / RW 04 — Margorejo, Banyuanyar, Banjarsari, Surakarta 57137
 
-Situs resmi warga **RT 01 / RW 04**, Kelurahan Banyuanyar, Kecamatan Banjarsari, Kota Surakarta, Jawa Tengah **57137**.
-
-> **DARI WARGA UNTUK WARGA**
-
-Situs dibuat sebagai satu berkas `index.html` yang sudah memuat seluruh foto, gaya, dan skrip di dalamnya — jadi bisa dibuka langsung tanpa server, tanpa internet, dan tanpa database.
+Website interaktif untuk warga RT 01 / RW 04. Seluruh isi berada dalam **satu berkas `index.html`** — foto, gaya, dan skrip sudah menyatu di dalamnya, jadi bisa dibuka langsung tanpa internet dan tanpa server.
 
 ---
 
-## 🌐 Lihat situsnya
+## 1. Isi paket
 
-Setelah GitHub Pages diaktifkan (lihat langkah di bawah), situs dapat diakses di:
-
-```
-https://<nama-akun-github>.github.io/rt01-banyuanyar/
-```
-
----
-
-## ✨ Fitur
-
-| Bagian | Isi |
+| Berkas | Keterangan |
 |---|---|
-| **Beranda** | Sambutan, alamat lengkap, ringkasan angka, tombol cepat |
-| **Struktur Pengurus** | 7 pengurus dengan tombol WhatsApp langsung |
-| **Lapor** | 4 kanal: Keluhan Warga, Usulan & Surat, Iuran Wajib, Jimpitan |
-| **Himbauan Sampah** | Ilustrasi 3 bak sampah, 4 langkah pemilahan, kuis 12 jenis sampah, komitmen warga |
-| **Kegiatan & Galeri** | 6 program kegiatan, 19 foto dengan filter + penampil layar penuh |
-| **Tanya Jawab & Kontak** | FAQ warga, alamat, jam layanan, tombol Google Maps |
-
-- **Formulir → WhatsApp**: pesan tersusun otomatis (rapi & bernomor), ada pratinjau, tombol salin pesan, dan riwayat laporan di perangkat.
-- **Mode gelap/terang**, ramah ponsel, tanpa geser horizontal, siap dicetak.
-- **Ukuran huruf dasar 20px** (huruf sedang) agar nyaman dibaca warga segala usia.
-
----
-
-## 👥 Pengurus & kontak WhatsApp
-
-| Jabatan | Nama | WhatsApp |
-|---|---|---|
-| Ketua RT | Awan Prihanto, S.T. | 0812-6943-924 |
-| Ketua PKK | Handayani, S.E. | 0821-3774-4787 |
-| Sekretaris I | Sardi, S.Pd. | 0817-266-669 |
-| Sekretaris II | Tri Widagdo | 0819-1232-9060 |
-| Bendahara I | Wiryanto (Antok Comal) | 0813-2773-1313 |
-| Bendahara II | Wahyu Widodo | 0882-3349-1027 |
-| Bendahara Jimpitan | Ikhsan Jauhari | 0812-2629-9906 |
-
-Penerima laporan: **Keluhan → Ketua RT**, **Usulan & Surat → Sekretaris I**, **Iuran Wajib → Bendahara II**, **Jimpitan → Bendahara Jimpitan**.
+| `index.html` | **Website siap pakai** (2,2 MB, sudah termasuk 19 foto kegiatan). Buka dengan Chrome/Safari/Edge. |
+| `README.md` | Panduan ini. |
+| `src/app.js` | Kode interaktif + **data pengurus dan nomor WhatsApp** (untuk pengembangan). |
+| `src/app.css` | Tampilan dasar (untuk pengembangan). |
+| `src/elegant.css` | Tema elegan & profesional (huruf dasar 20px) + ilustrasi bak sampah. |
+| `src/index.template.html` | Kerangka halaman (untuk pengembangan). |
+| `src/prep_images2.py` | Skrip pengolah foto (kompresi + ubah ke WebP). |
+| `src/build.py` | Skrip penggabung: template + CSS + JS + foto → `index.html`. |
+| `assets/*.webp` | Foto kegiatan yang sudah dioptimalkan. |
+| `uploads/` | Foto asli yang Anda kirimkan. |
 
 ---
 
-## 📁 Struktur repo
+## 2. Fitur website (tema elegan & profesional)
 
-```
-.
-├── index.html          ← situs siap pakai (semua aset sudah di dalamnya)
-├── .nojekyll           ← agar GitHub Pages tidak memproses situs dengan Jekyll
-├── README.md
-├── LICENSE
-├── panduan/
-│   └── EDIT-SITUS.md   ← cara mengubah nomor, teks, dan foto
-├── src/                ← kode sumber (opsional, untuk pengembangan)
-│   ├── index.template.html
-│   ├── app.js          ← data pengurus, teks formulir, konfigurasi
-│   ├── app.css
-│   ├── elegant.css     ← tema elegan & profesional
-│   ├── prep_images2.py ← optimasi foto → WebP
-│   ├── build.py        ← gabung template + css + js + foto → index.html
-│   └── images.json
-├── uploads/            ← foto asli dari warga
-└── assets/             ← foto yang sudah dioptimalkan
-```
+Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, judul serif, kartu bertepi halus, pita slogan berjalan, dan animasi lembut (otomatis nonaktif bila pengguna memilih reduce-motion). Ukuran huruf dasar **20px (huruf sedang)** agar nyaman dibaca warga segala usia; otomatis menyesuaikan 19–18px di layar kecil. Slogan **“DARI WARGA UNTUK WARGA”** tampil di hero, pita berjalan, dan footer.
 
----
+1. **Beranda** — sambutan, alamat lengkap, ringkasan angka, tombol cepat.
+2. **Struktur pengurus** — 7 pengurus dengan **tombol gelembung WhatsApp**. Nomor pribadi **tidak ditampilkan** di halaman; tombol langsung membuka chat dengan pesan siap kirim.
+3. **Keluhan Warga** → WhatsApp Ketua RT (Bp. Awan Prihanto, S.T.)
+4. **Usulan & Surat** → WhatsApp Sekretaris I (Bp. Sardi, S.Pd.)
+5. **Laporan Iuran Wajib** → WhatsApp Bendahara II (Bp. Wahyu Widodo)
+6. **Laporan Jimpitan** → WhatsApp Bendahara Jimpitan (Bp. Ikhsan Jauhari)
+   - Setiap formulir: validasi isian, pratinjau pesan, tombol **Salin pesan**, dan **riwayat laporan** di perangkat.
+   - Format pesan otomatis, sehingga mudah dibaca dan diarsipkan pengurus.
+   - Tombol kirim memakai **ikon gelembung chat**, bukan lagi logo WA.
+7. **Himbauan pengelolaan sampah** — **ilustrasi 3 bak sampah (organik, anorganik, residu/B3)**, 4 langkah pemilahan, kuis interaktif 12 jenis sampah dengan **bak sampah bergambar**, dan daftar komitmen warga yang tersimpan otomatis.
+8. **Galeri** — 19 foto dengan filter kategori dan penampil layar penuh (bisa digeser di ponsel).
+9. **Tanya jawab** — iuran, jimpitan, pemilahan sampah, dan privasi data.
+10. **Kontak & lokasi** — alamat, jam layanan, tombol Google Maps.
+11. **Mode gelap/terang**, navigasi seluler, tombol aksi cepat di bawah layar, animasi halus, dan siap dicetak.
 
-## 🚀 Mengaktifkan GitHub Pages
-
-1. Buka repo ini di GitHub → tab **Settings**.
-2. Menu kiri: **Pages**.
-3. Bagian **Build and deployment** → *Source*: **Deploy from a branch**.
-4. *Branch*: **main**, folder: **/ (root)** → **Save**.
-5. Tunggu 1–2 menit, lalu buka tautan `https://<nama-akun>.github.io/rt01-banyuanyar/`.
-
-> Berkas `index.html` otomatis menjadi halaman utama — tidak perlu konfigurasi tambahan.
+> Catatan privasi: tidak ada data yang dikirim ke server. Situs berjalan di perangkat warga; laporan baru terkirim setelah warga menekan tombol WhatsApp dan mengirim pesan.
 
 ---
 
-## 🔄 Cara memperbarui situs
+## 3. Cara memakai
 
-**Cara termudah (tanpa alat):**
-
-1. Buka `index.html` di GitHub → ikon ✏️ (Edit).
-2. Cari teks/nomor yang ingin diganti (mis. `08126943924`).
-3. **Commit changes** → tunggu ±1 menit, situs otomatis diperbarui.
-
-**Cara rapi (disarankan untuk perubahan besar):**
-
-```bash
-# 1. clone repo
-git clone https://github.com/<nama-akun>/rt01-banyuanyar.git
-cd rt01-banyuanyar
-
-# 2. ubah data di src/app.js (pengurus, nomor WhatsApp, teks formulir)
-#    atau src/index.template.html (teks halaman)
-
-# 3. bangun ulang index.html
-python3 src/build.py
-
-# 4. kirim perubahan
-git add -A
-git commit -m "Perbarui data pengurus"
-git push
-```
+- **Dari komputer:** klik dua kali `index.html`.
+- **Dari ponsel:** kirim `index.html` lewat WhatsApp/email ke ponsel, lalu buka dengan aplikasi Chrome/Files.
+- **Gratis di internet** (agar bisa dibagikan sebagai tautan):
+  1. Buka <https://app.netlify.com/drop> → seret berkas `index.html` → tautan langsung jadi (mis. `rt01-banyuanyar.netlify.app`).
+  2. Alternatif: GitHub Pages, Cloudflare Pages, atau Vercel — unggah satu berkas yang sama.
+  3. Buat **QR code** dari tautan tersebut, lalu tempel di Pos Kamling / grup WhatsApp warga.
 
 ---
 
-## 🖼️ Menambah foto kegiatan
+## 4. Mengubah data pengurus / nomor WhatsApp
 
-1. Taruh foto baru di `uploads/`.
-2. Daftarkan nama berkasnya di `src/prep_images2.py` (bagian `JOBS`).
-3. Jalankan:
+**Cara cepat (tanpa alat tambahan):** buka `index.html` dengan Notepad/TextEdit, cari nomor lama (mis. `08126943924`), ganti, lalu simpan.
+
+**Cara rapi (disarankan):**
+1. Buka `src/app.js`, bagian **`const CONFIG`** di baris paling atas.
+2. Ubah `pengurus` (nama, jabatan, nomor `wa`), `layanan`, atau alamat.
+   - Nomor boleh ditulis `08xx…`; situs otomatis mengubahnya ke format WhatsApp `62xx…`.
+   - Untuk pengurus tanpa nomor, cukup isi `wa: ""` → akan tampil "Nomor WA belum dicantumkan".
+3. Jalankan pembangun ulang:
    ```bash
-   python3 src/prep_images2.py   # optimasi → assets/*.webp
-   python3 src/build.py          # gabung ulang → index.html
+   python3 src/build.py
    ```
-4. Tambahkan keterangan foto pada `GALLERY` di `src/app.js`.
+4. `index.html` otomatis diperbarui. Foto baru? Tambahkan ke `uploads/`, daftarkan di `src/prep_images2.py`, jalankan `python3 src/prep_images2.py` lalu `python3 src/build.py`.
 
 ---
 
-## 🔒 Privasi
+## 5. Usulan pengembangan lanjutan (opsional)
 
-Situs ini **statis**: tidak ada server, tidak ada database, dan tidak ada data warga yang dikirim ke mana pun. Riwayat laporan hanya tersimpan di penyimpanan lokal peramban (localStorage) milik masing-masing perangkat dan dapat dihapus kapan saja. Laporan baru terkirim setelah warga menekan tombol WhatsApp dan mengirim pesannya.
-
----
-
-## 📄 Lisensi
-
-- **Kode** situs: MIT (bebas dipakai & dimodifikasi untuk kepentingan warga).
-- **Foto & dokumen kegiatan**: milik warga RT 01 / RW 04 Banyuanyar — mohon tidak dipakai ulang tanpa izin.
+- Nomor WhatsApp untuk Ketua PKK, Sekretaris I–II, dan Bendahara I dapat ditambahkan kapan saja (sekarang belum tercantum, jadi tombolnya belum muncul).
+- Nominal iuran wajib & jadwal jimpitan dapat ditulis permanen setelah disepakati musyawarah warga.
+- Bisa ditambah: struktur RW, jadwal ronda per rumah, dan rekap kas bulanan (butuh pembaruan berkala oleh bendahara).
 
 ---
 
-## 🤝 Kontribusi warga
+## 6. Kontak pengurus (nomor disembunyikan)
 
-Punya usulan tampilan, data kegiatan baru, atau koreksi nomor pengurus? Silakan buka **Issues** di repo ini atau hubungi Sekretaris RT.
+| Jabatan | Nama | Kontak di situs |
+|---|---|---|
+| Ketua RT | Awan Prihanto, S.T. | Tombol gelembung WhatsApp |
+| Ketua PKK | Handayani, S.E. | Tombol gelembung WhatsApp |
+| Sekretaris I | Sardi, S.Pd. | Tombol gelembung WhatsApp |
+| Sekretaris II | Tri Widagdo | Tombol gelembung WhatsApp |
+| Bendahara I | Wiryanto (Antok Comal) | Tombol gelembung WhatsApp |
+| Bendahara II | Wahyu Widodo | Tombol gelembung WhatsApp |
+| Bendahara Jimpitan | Ikhsan Jauhari | Tombol gelembung WhatsApp |
 
----
+**Nomor tidak ditampilkan di halaman** (permintaan pengurus): kartu pengurus dan panel “Nomor penting” hanya menampilkan **ikon gelembung WhatsApp** yang langsung membuka chat. Nomor tetap tersimpan di `CONFIG.pengurus` pada `src/app.js` (format `08…`, otomatis diubah ke `62…` saat membuat tautan `wa.me`) dan dipakai tombol kirim formulir.
 
-**RT 01 / RW 04 — Margorejo, Banyuanyar, Banjarsari, Surakarta 57137**
-*Guyub rukun, rukun agawe santosa.* 🌿
+> Catatan teknis: karena situs statis, tautan WhatsApp tetap memuat nomor di dalam alamat `wa.me` — angka hanya **tidak terlihat** oleh warga di halaman. Untuk benar-benar menutup nomor, gunakan tautan pengalihan (link shortener/redirect) di server sendiri.
+
+## 7. Data ringkas
+
+- **Alamat:** Margorejo, RT 01 / RW 04, Banyuanyar, Banjarsari, Surakarta, Jawa Tengah **57137**
+- **Ketua RT:** Awan Prihanto, S.T.
+- **Ketua PKK:** Handayani, S.E.
+- **Sekretaris I / II:** Sardi, S.Pd. / Tri Widagdo
+- **Bendahara I / II:** Wiryanto (Antok Comal) / Wahyu Widodo
+- **Bendahara Jimpitan:** Ikhsan Jauhari
+- **Kontak warga:** semua lewat tombol WhatsApp di halaman (nomor tidak ditampilkan)
+
+*Selamat mengelola lingkungan, semoga RT 01 / RW 04 makin guyub dan sejahtera.* 🌿

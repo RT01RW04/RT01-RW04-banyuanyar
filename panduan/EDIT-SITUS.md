@@ -17,14 +17,15 @@ Buka **`src/app.js`**, cari bagian paling atas:
 ```js
 const CONFIG = {
   pengurus: [
-    { nama: "Awan Prihanto, S.T.", peran: "Ketua RT", wa: "08126943924", lead: true, ket: "..." },
-    { nama: "Handayani, S.E.",     peran: "Ketua PKK", wa: "082137744787", ket: "..." },
-    { nama: "Sardi, S.Pd.",        peran: "Sekretaris I", wa: "0817266669", ket: "..." },
+    { nama: "Awan Prihanto, S.T.", peran: "Ketua RT", wa: "08xxxxxxxxxx", lead: true, ket: "..." },
+    { nama: "Handayani, S.E.",     peran: "Ketua PKK", wa: "08xxxxxxxxxx", ket: "..." },
+    { nama: "Sardi, S.Pd.",        peran: "Sekretaris I", wa: "08xxxxxxxxxx", ket: "..." },
     ...
   ],
 ```
 
 - Tulis nomor dengan awalan `08…` — situs otomatis mengubahnya ke format WhatsApp `62…`.
+- **Nomor tidak tampil di halaman.** Kartu pengurus dan panel “Nomor penting” hanya menampilkan ikon gelembung WhatsApp; nomor dipakai di balik tombol (`wa.me/62…`).
 - Ingin menyembunyikan nomor? Isi `wa: ""` → akan tampil “Nomor WA belum dicantumkan”.
 - `peran` mengikuti urutan tampil di kartu pengurus.
 
@@ -36,10 +37,10 @@ Masih di `CONFIG`, bagian `layanan`:
 
 ```js
 layanan: {
-  keluhan:  { penerima: "Awan Prihanto, S.T.", wa: "08126943924", template: [ ... ] },
-  usulan:   { penerima: "Sardi, S.Pd.",        wa: "0817266669",  template: [ ... ] },
-  iuran:    { penerima: "Wahyu Widodo",        wa: "088233491027", template: [ ... ] },
-  jimpitan: { penerima: "Ikhsan Jauhari",      wa: "081226299906", template: [ ... ] }
+  keluhan:  { penerima: "Awan Prihanto, S.T.", wa: "08xxxxxxxxxx", template: [ ... ] },
+  usulan:   { penerima: "Sardi, S.Pd.",        wa: "08xxxxxxxxxx",  template: [ ... ] },
+  iuran:    { penerima: "Wahyu Widodo",        wa: "08xxxxxxxxxx", template: [ ... ] },
+  jimpitan: { penerima: "Ikhsan Jauhari",      wa: "08xxxxxxxxxx", template: [ ... ] }
 }
 ```
 
