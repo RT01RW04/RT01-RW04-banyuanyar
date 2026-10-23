@@ -397,7 +397,13 @@
     } catch (e) { return []; }
   }
   function pumSave(list) {
-    try { localStorage.setItem(PUM_KEY, JSON.stringify(list)); } catch (e) {}
+    try {
+      localStorage.setItem(PUM_KEY, JSON.stringify(list));
+      return true;
+    } catch (e) {
+      toast("Penyimpanan peramban penuh. Hapus gambar/pengumuman lama lalu coba lagi.", "err");
+      return false;
+    }
   }
   function pumToday() {
     const d = new Date();
@@ -455,6 +461,10 @@
           (baru ? '<span class="pum-new">Baru</span>' : "") +
           '<time class="pum-date" datetime="' + escapeHTML(a.tanggal || "") + '">' + escapeHTML(pumTanggalID(a.tanggal)) + "</time>" +
         "</div>" +
+        (a.img
+          ? '<figure class="pum-fig"><img src="' + a.img + '" alt="Foto pengumuman: ' + escapeHTML(a.judul || "") +
+            '" loading="lazy" data-photo="' + escapeHTML(a.id) + '"><figcaption class="pum-fig__zoom">Ketuk untuk memperbesar</figcaption></figure>'
+          : "") +
         '<h3 class="pum-card__title">' + escapeHTML(a.judul || "") + "</h3>" +
         '<p class="pum-card__body">' + escapeHTML(a.isi || "").replace(/\n/g, "<br>") + "</p>" +
         '<div class="pum-card__foot">' +
@@ -471,6 +481,67 @@
     if (foot) {
       foot.hidden = false;
       foot.innerHTML = "Pengumuman disimpan di perangkat ini. Ketuk <strong>Bagikan</strong> untuk meneruskan ke grup WhatsApp warga.";
+    }
+  }
+
+  /* --- unggah & kompresi gambar pengumuman --- */
+  let pumImgDraft = "";          // dataURL gambar yang sedang disiapkan
+  const PUM_IMG_MAX = 1280;      // sisi terpanjang (px)
+  const PUM_IMG_BYTES = 250000;  // target ukuran dataURL (±250 KB)
+
+  function pumFileToDataURL(file, cb) {
+    const fr = new FileReader();
+    fr.onload = () => cb(String(fr.result || ""));
+    fr.onerror = () => cb("");
+    fr.readAsDataURL(file);
+  }
+
+  function pumFitImage(dataUrl, fileType, cb) {
+    const img = new Image();
+    img.onload = () => {
+      const ratio = Math.min(1, PUM_IMG_MAX / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * ratio));
+      const h = Math.max(1, Math.round(img.height * ratio));
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      /* PNG kecil dengan transparansi dipertahankan */
+      if (/png/i.test(fileType) && dataUrl.length < PUM_IMG_BYTES * 1.37) {
+        cb(dataUrl);
+        return;
+      }
+      let q = 0.82;
+      let out = cv.toDataURL("image/jpeg", q);
+      while (out.length > PUM_IMG_BYTES * 1.37 && q > 0.4) {
+        q -= 0.08;
+        out = cv.toDataURL("image/jpeg", q);
+      }
+      cb(out);
+    };
+    img.onerror = () => cb("");
+    img.src = dataUrl;
+  }
+
+  function pumSetPreview(dataUrl, name) {
+    pumImgDraft = dataUrl || "";
+    const prev = $("#pumGambarPrev");
+    const thumb = $("#pumGambarThumb");
+    const del = $("#pumGambarHapus");
+    const nama = $("#pumGambarNama");
+    const note = $("#pumGambarNote");
+    if (thumb) thumb.src = pumImgDraft || "";
+    if (prev) prev.hidden = !pumImgDraft;
+    if (del) del.hidden = !pumImgDraft;
+    if (nama) nama.textContent = pumImgDraft ? (name || "Gambar terpasang") : "Pilih gambar…";
+    if (note && pumImgDraft) {
+      const kb = Math.round(pumImgDraft.length * 0.75 / 1024);
+      note.textContent = "Gambar siap (" + (name ? name + " · " : "") + "±" + kb + " KB setelah dikompres).";
+    } else if (note) {
+      note.textContent = "Gambar otomatis diperkecil & dikompres (±250 KB) agar hemat ruang penyimpanan.";
     }
   }
 
@@ -518,8 +589,11 @@
     box.innerHTML = data.map((a) =>
       '<div class="admin-item">' +
         '<div class="admin-item__main">' +
+          (a.img ? '<img class="admin-item__thumb" src="' + a.img + '" alt="">' : '<span class="admin-item__thumb admin-item__thumb--none" aria-hidden="true">–</span>') +
+          '<div>' +
           '<p class="admin-item__title">' + escapeHTML(a.judul) + "</p>" +
-          '<p class="admin-item__meta">' + escapeHTML(a.kategori || "Umum") + " · " + escapeHTML(pumTanggalID(a.tanggal)) + (a.pin ? " · disematkan" : "") + "</p>" +
+          '<p class="admin-item__meta">' + escapeHTML(a.kategori || "Umum") + " · " + escapeHTML(pumTanggalID(a.tanggal)) + (a.pin ? " · disematkan" : "") + (a.img ? " · bergambar" : "") + "</p>" +
+          "</div>" +
         "</div>" +
         '<div class="admin-item__acts">' +
           '<button type="button" class="admin-mini" data-edit="' + escapeHTML(a.id) + '">Edit</button>' +
@@ -539,6 +613,9 @@
     $("#pumFormTitle").textContent = "Tambah pengumuman";
     $("#pumSubmit").textContent = "Terbitkan";
     $("#pumCancel").hidden = true;
+    const file = $("#pumGambar");
+    if (file) file.value = "";
+    pumSetPreview("", "");
   }
 
   function initPengumuman() {
@@ -552,6 +629,13 @@
       const share = e.target.closest("[data-share]");
       if (share) { pumShare(share.getAttribute("data-share")); return; }
 
+      const photo = e.target.closest("[data-photo]");
+      if (photo) {
+        const item = pumLoad().find((x) => String(x.id) === photo.getAttribute("data-photo"));
+        if (item && item.img) openPhoto(item.img, item.judul || "Pengumuman warga", item.kategori || "Pengumuman");
+        return;
+      }
+
       const edit = e.target.closest("[data-edit]");
       if (edit) {
         const a = pumLoad().find((x) => String(x.id) === edit.getAttribute("data-edit"));
@@ -562,6 +646,9 @@
         $("#pumKategori").value = a.kategori || "Umum";
         $("#pumTanggal").value = a.tanggal || pumToday();
         $("#pumPin").checked = !!a.pin;
+        pumSetPreview(a.img || "", a.img ? "Gambar tersimpan" : "");
+        const fileEdit = $("#pumGambar");
+        if (fileEdit) fileEdit.value = "";
         $("#pumFormTitle").textContent = "Edit pengumuman";
         $("#pumSubmit").textContent = "Simpan perubahan";
         $("#pumCancel").hidden = false;
@@ -623,6 +710,43 @@
       toast("Anda sudah keluar dari panel pengurus.");
     });
 
+    const fileInput = $("#pumGambar");
+    if (fileInput) {
+      fileInput.addEventListener("change", () => {
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) { pumSetPreview("", ""); return; }
+        if (!/^image\/(jpeg|jpg|png|webp)$/i.test(f.type)) {
+          toast("Pilih berkas JPG atau PNG.", "err");
+          fileInput.value = "";
+          return;
+        }
+        if (f.size > 12 * 1024 * 1024) {
+          toast("Ukuran gambar terlalu besar (maks. 12 MB).", "err");
+          fileInput.value = "";
+          return;
+        }
+        toast("Memproses gambar…");
+        pumFileToDataURL(f, (raw) => {
+          if (!raw) { toast("Gambar tidak dapat dibaca.", "err"); return; }
+          pumFitImage(raw, f.type, (out) => {
+            if (!out) { toast("Gambar tidak dapat diproses.", "err"); return; }
+            pumSetPreview(out, f.name.length > 26 ? f.name.slice(0, 24) + "…" : f.name);
+            toast("Gambar siap dipakai.");
+          });
+        });
+      });
+    }
+
+    const delImg = $("#pumGambarHapus");
+    if (delImg) {
+      delImg.addEventListener("click", () => {
+        const file = $("#pumGambar");
+        if (file) file.value = "";
+        pumSetPreview("", "");
+        toast("Gambar dilepas dari formulir.");
+      });
+    }
+
     const form = $("#pumForm");
     if (form) {
       form.addEventListener("submit", (e) => {
@@ -641,12 +765,13 @@
           isi: isi,
           kategori: $("#pumKategori").value,
           tanggal: $("#pumTanggal").value || pumToday(),
-          pin: $("#pumPin").checked
+          pin: $("#pumPin").checked,
+          img: pumImgDraft || ""
         };
         const data = pumLoad();
         const idx = data.findIndex((x) => String(x.id) === String(id));
         if (idx >= 0) data[idx] = item; else data.push(item);
-        pumSave(data);
+        if (!pumSave(data)) return;
         pumResetForm();
         renderAdminList();
         renderPengumuman();
@@ -1328,6 +1453,25 @@
     const close = $(".lightbox__close", lb);
     if (close) close.focus();
   }
+  let photoMode = false;
+
+  function openPhoto(src, caption, kicker) {
+    const lb = $("#lightbox");
+    if (!lb || !src) return;
+    photoMode = true;
+    lb.classList.add("is-open", "is-photo");
+    lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    const img = $("#lightboxImg");
+    if (img) { img.src = src; img.alt = caption || "Foto pengumuman"; }
+    const cap = $("#lightboxCap");
+    if (cap) cap.innerHTML = "<b>" + escapeHTML(kicker || "Pengumuman") + "</b>" + escapeHTML(caption || "");
+    const count = $("#lightboxCount");
+    if (count) count.textContent = "";
+    const close = $(".lightbox__close", lb);
+    if (close) close.focus();
+  }
+
   function paintLightbox() {
     const idx = galVisible[lbIndex];
     if (idx === undefined) return;
@@ -1342,11 +1486,13 @@
   function closeLightbox() {
     const lb = $("#lightbox");
     if (!lb) return;
-    lb.classList.remove("is-open");
+    lb.classList.remove("is-open", "is-photo");
+    photoMode = false;
     lb.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   }
   function moveLightbox(dir) {
+    if (photoMode) return;
     if (!galVisible.length) return;
     lbIndex = (lbIndex + dir + galVisible.length) % galVisible.length;
     paintLightbox();

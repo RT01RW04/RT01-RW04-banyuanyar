@@ -160,6 +160,8 @@ python3 src/hash_password.py "kata-sandi-baru"
 Salin hasil `hash` ke `src/app.js` → `CONFIG.admin.hash`, lalu `python3 src/build.py`.
 
 **Mengisi pengumuman:** Pengumuman → **Kelola** → masuk → isi Judul, Kategori, Tanggal, Isi → **Terbitkan**.
+
+**Menambah gambar:** pada formulir, tekan **Pilih gambar…** lalu pilih berkas **JPG / PNG** (maks. 12 MB). Situs otomatis memperkecil ke 1280 px dan mengompres ke ±250 KB. Tombol **Hapus** melepas gambar. Klik gambar pada kartu untuk memperbesar.
 Gunakan **Edit / Sematkan / Hapus** pada daftar, dan **Bagikan** untuk meneruskan ke grup WhatsApp.
 
 > Situs statis: pengumuman tersimpan di peramban perangkat yang mengisinya. Untuk warga lain, gunakan tombol **Bagikan**.

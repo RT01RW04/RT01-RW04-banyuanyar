@@ -27,7 +27,7 @@ Tampilan memakai gaya **elegan–profesional**: palet emerald–emas–ivory, ju
 
 1. **Beranda** — sambutan, alamat lengkap, ringkasan angka, tombol cepat.
 2. **Struktur pengurus** — 7 pengurus dengan **tombol gelembung WhatsApp**. Nomor pribadi **tidak ditampilkan** di halaman; tombol langsung membuka chat dengan pesan siap kirim.
-2b. **Pengumuman warga** — papan kabar resmi pengurus: kategori (Kegiatan, Kesehatan, Keamanan, Iuran, Umum), tanggal, tanda **Disematkan** & **Baru**, dan tombol **Bagikan** ke WhatsApp. Diisi lewat panel **Kelola** (khusus pengurus, dengan nama pengguna + kata sandi).
+2b. **Pengumuman warga** — papan kabar resmi pengurus: kategori (Kegiatan, Kesehatan, Keamanan, Iuran, Umum), tanggal, tanda **Disematkan** & **Baru**, **gambar/foto JPG-PNG** (dikompres otomatis), dan tombol **Bagikan** ke WhatsApp. Diisi lewat panel **Kelola** (khusus pengurus, dengan nama pengguna + kata sandi).
 2c. **Penilaian bintang 5** — warga memberi nilai 1–5 bintang beserta catatan singkat untuk **Ketua RT** dan **Ketua PKK** di halaman Pengurus; penilaian terkirim ke WhatsApp masing-masing pengurus.
 3. **Keluhan Warga** → WhatsApp Ketua RT (Bp. Awan Prihanto, S.T.)
 4. **Usulan & Surat** → WhatsApp Sekretaris I (Bp. Sardi, S.Pd.)
@@ -113,14 +113,16 @@ Panel **Kelola** pada bagian Pengumuman memakai satu akun bersama untuk seluruh 
 1. Buka situs → bagian **Pengumuman** → tombol **Kelola**.
 2. Masuk dengan nama pengguna dan kata sandi.
 3. Isi **Judul**, **Kategori**, **Tanggal**, **Isi**, dan centang **Sematkan** bila perlu.
-4. Tekan **Terbitkan**. Pengumuman langsung tampil; gunakan **Edit / Lepas / Hapus** pada daftar di bawah formulir.
-5. Tekan **Bagikan** pada kartu pengumuman untuk meneruskannya ke grup WhatsApp warga.
+4. (Opsional) Tekan **Pilih gambar…** untuk menyisipkan foto **JPG / PNG** (maks. 12 MB sebelum diproses). Gambar otomatis diperkecil ke sisi terpanjang 1280 px dan dikompres ke ±250 KB, lalu tampil sebagai pratinjau. Tombol **Hapus** melepas gambar dari formulir.
+5. Tekan **Terbitkan**. Pengumuman langsung tampil; gunakan **Edit / Lepas / Hapus** pada daftar di bawah formulir. Klik gambar pada kartu untuk membukanya besar (lightbox).
+6. Tekan **Bagikan** pada kartu pengumuman untuk meneruskannya ke grup WhatsApp warga (teks; foto dilampirkan manual dari galeri).
 
 ### Batasan penting (situs statis)
 - Pengumuman **tersimpan di peramban perangkat tempat ia dibuat** (localStorage) — belum ada server, jadi pengumuman **tidak otomatis muncul** di perangkat warga lain.
 - Untuk menyebarkannya ke warga, gunakan tombol **Bagikan ke WhatsApp** (atau tempel teks pengumuman ke grup).
 - Login bersifat penghalang ringan (hash di dalam berkas), bukan sistem keamanan penuh. Jangan menaruh data sensitif.
 - Sesi login bertahan sampai tab ditutup (sessionStorage).
+- Gambar disimpan sebagai dataURL di dalam penyimpanan peramban (localStorage ±5 MB). Karena itu setiap gambar dikompres ke ±250 KB — cukup untuk ±12–15 pengumuman bergambar. Bila penyimpanan penuh, situs menampilkan pesan agar pengumuman lama dihapus.
 
 ### Penilaian bintang
 - Nilai disimpan di perangkat warga (agar tampil kembali saat dibuka), lalu **dikirim ke WhatsApp** Ketua RT atau Ketua PKK beserta catatan.
